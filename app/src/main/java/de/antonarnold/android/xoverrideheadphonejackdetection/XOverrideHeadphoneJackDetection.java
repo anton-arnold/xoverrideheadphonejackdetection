@@ -43,6 +43,7 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 boolean overrideEnable = true;
                 int overrideValue = 0;
+                int overrideMask = 20;
 
                 ConfigReceiver cr = getConfigReceiver();
 
@@ -88,11 +89,12 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
                 {
                     overrideEnable = cr.getOverrideEnable();
                     overrideValue = cr.getOverrideValue();
+                    overrideMask = cr.getOverrideMask();
                 }
 
 
                 if(overrideEnable) {
-                    XposedBridge.log("override headphone jack detection hook (" + param.args[1] + " -> " + overrideValue + ")");
+                    XposedBridge.log("override headphone jack detection hook (value: " + param.args[1] + " -> " + overrideValue + " | mask: " + param.args[2] + " -> " + overrideMask + ")");
                     param.args[1] = overrideValue;
                 }
                 else

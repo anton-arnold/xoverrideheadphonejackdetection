@@ -3,17 +3,13 @@ package de.antonarnold.android.xoverrideheadphonejackdetection;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.SystemClock;
 
 import de.robv.android.xposed.XposedBridge;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class ConfigReceiver extends BroadcastReceiver {
-    private static final int SW_HEADPHONE_INSERT = 0x02;
-    private static final int SW_MICROPHONE_INSERT = 0x04;
-
-    private static final int SW_HEADPHONE_INSERT_BIT = 1 << SW_HEADPHONE_INSERT;
-    private static final int SW_MICROPHONE_INSERT_BIT = 1 << SW_MICROPHONE_INSERT;
-
     private boolean isRegistered;
     private boolean overrideEnable;
     private int overrideValue;
@@ -25,7 +21,7 @@ public class ConfigReceiver extends BroadcastReceiver {
         isRegistered = false;
         overrideEnable = true;
         overrideValue = 0;
-        overrideMask =  SW_HEADPHONE_INSERT_BIT | SW_MICROPHONE_INSERT_BIT;
+        overrideMask =  20;
         callbackClass = null;
     }
 
@@ -34,6 +30,14 @@ public class ConfigReceiver extends BroadcastReceiver {
         XposedBridge.log("ConfigReceiver.onReceive(...) called!");
 
         //todo get data
+        if(intent != null) {
+            Bundle extras = intent.getExtras();
+            if(extras != null) {
+                overrideEnable = extras.getInt("overrideEnable", 1) != 0;
+                overrideValue = extras.getInt("overrideValue", 0);
+                overrideMask = extras.getInt("overrideMask", 20);
+            }
+        }
 
         //enforce update on callback class
         if(callbackClass != null)
@@ -56,6 +60,11 @@ public class ConfigReceiver extends BroadcastReceiver {
     public int getOverrideValue()
     {
         return overrideValue;
+    }
+
+    public int getOverrideMask()
+    {
+        return overrideMask;
     }
 
     public boolean getIsRegistered()
