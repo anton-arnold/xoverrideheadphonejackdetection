@@ -14,7 +14,12 @@ import de.robv.android.xposed.XposedBridge;
 
 
 public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
-    static final String CONFIG_ACTION = "de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver";
+    private static final String CONFIG_ACTION = "de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver";
+
+    private static boolean initializedOnce = false;
+
+    private static boolean overrideEnable = true;
+    private static int overrideValue = 0;
 
     private static ConfigReceiver configReceiverInstance;
 
@@ -34,49 +39,58 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
         if (!lpparam.packageName.equals("android"))
             return;
 
-        XposedBridge.log("preparing shared memory...");
-        Application app = getApplicationUsingReflection();
-
-        if(app != null)
-        {
-            Context ctx = app.getApplicationContext();
-            if(ctx != null)
-            {
-                ConfigReceiver cr = getConfigReceiver();
-                if(cr != null)
-                {
-                    IntentFilter intentFilter = new IntentFilter(CONFIG_ACTION);
-                    if(intentFilter != null) {
-                        XposedBridge.log("registering config receiver intent...");
-                        ctx.registerReceiver(cr, intentFilter);
-                        XposedBridge.log("config receiver intent registered...");
-                    }
-                    else {
-                        XposedBridge.log("cannot create IntentFilter...");
-                    }
-                }
-                else
-                {
-                    XposedBridge.log("getConfigReceiver() failed...");
-                }
-            }
-            else
-            {
-                XposedBridge.log("getApplicationContext() failed...");
-            }
-        }
-        else
-        {
-            XposedBridge.log("getApplicationUsingReflection() failed...");
-        }
 
         XposedBridge.log("add hooks in android...");
 
         findAndHookMethod("com.android.server.WiredAccessoryManager", lpparam.classLoader, "notifyWiredAccessoryChanged", long.class, int.class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                boolean overrideEnable = true;
-                int overrideValue = 0;
+                if(initializedOnce == false)
+                {
+                    initializedOnce = true;
+
+                    XposedBridge.log("preparing shared memory...");
+                    Application app = getApplicationUsingReflection();
+
+                    if(app != null)
+                    {
+                        Context ctx = app.getApplicationContext();
+                        if(ctx != null)
+                        {
+                            ConfigReceiver cr = getConfigReceiver();
+                            if(cr != null)
+                            {
+                                IntentFilter intentFilter = new IntentFilter(CONFIG_ACTION);
+                                if(intentFilter != null) {
+                                    XposedBridge.log("registering config receiver intent...");
+                                    try {
+                                        ctx.registerReceiver(cr, intentFilter);
+                                        XposedBridge.log("successfully registered...");
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        XposedBridge.log("registration failed with exception: " + e.getMessage());
+                                    }
+                                }
+                                else {
+                                    XposedBridge.log("cannot create IntentFilter...");
+                                }
+                            }
+                            else
+                            {
+                                XposedBridge.log("getConfigReceiver() failed...");
+                            }
+                        }
+                        else
+                        {
+                            XposedBridge.log("getApplicationContext() failed...");
+                        }
+                    }
+                    else
+                    {
+                        XposedBridge.log("getApplicationUsingReflection() failed...");
+                    }
+                }
 
                 //todo
 
