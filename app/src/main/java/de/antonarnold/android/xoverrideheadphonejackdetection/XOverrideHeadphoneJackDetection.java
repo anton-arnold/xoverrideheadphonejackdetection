@@ -13,13 +13,12 @@ import de.robv.android.xposed.XposedBridge;
 
 /*
 control via adb:
-adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 4 --ei overrideMask 20
-adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 20 --ei overrideMask 20
-adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 0 --ei overrideMask 20
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 4 --ei overrideMask 255
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 20 --ei overrideMask 255
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 0 --ei overrideMask 255
 adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 0
 todo:
 create small gui for enable/disable, values (optional: presets)
-check value+mask bits / internal state machine because of unplausible reactions
  */
 
 
@@ -77,7 +76,6 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
                                     if (intentFilter != null) {
                                         XposedBridge.log("registering config receiver intent...");
                                         ctx.registerReceiver(cr, intentFilter);
-                                        cr.setParentContext(ctx);
                                         cr.readConfig();
                                         cr.setIsRegistered(true);
                                         XposedBridge.log("successfully registered...");

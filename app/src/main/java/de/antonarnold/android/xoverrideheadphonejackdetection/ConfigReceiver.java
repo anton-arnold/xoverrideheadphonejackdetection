@@ -15,7 +15,7 @@ import de.robv.android.xposed.XposedBridge;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class ConfigReceiver extends BroadcastReceiver {
-    private static final String CONFIG_FILE = "xoverrideheadphonejackdetection.cfg";
+    private static final String CONFIG_FILE = "/data/system/xoverrideheadphonejackdetection.cfg.bin";
 
     private static final boolean defaultOverrideEnable = true;
     private static final int defaultOverrideValue = 0;
@@ -27,13 +27,11 @@ public class ConfigReceiver extends BroadcastReceiver {
     private int overrideValue;
     private int overrideMask;
     private Object callbackClass;
-    private Context parentContext;
 
     public ConfigReceiver()
     {
         isRegistered = false;
         callbackClass = null;
-        parentContext = null;
 
         overrideEnable = defaultOverrideEnable;
         overrideValue = defaultOverrideValue;
@@ -99,11 +97,6 @@ public class ConfigReceiver extends BroadcastReceiver {
         callbackClass = val;
     }
 
-    public void setParentContext(Context ctx)
-    {
-        parentContext = ctx;
-    }
-
     public void readConfig()
     {
         boolean backupOverrideEnable = overrideEnable;
@@ -111,7 +104,8 @@ public class ConfigReceiver extends BroadcastReceiver {
         int backupOverrideMask = overrideMask;
 
         try {
-            FileInputStream fileInputStream = parentContext.openFileInput(CONFIG_FILE);
+            File file = new File(CONFIG_FILE);
+            FileInputStream fileInputStream = new FileInputStream(file);
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
             overrideEnable = dataInputStream.readBoolean();
             overrideValue = dataInputStream.readInt();
@@ -130,7 +124,8 @@ public class ConfigReceiver extends BroadcastReceiver {
     private void writeConfig()
     {
         try {
-            FileOutputStream fileOutputStream = parentContext.openFileOutput(CONFIG_FILE, Context.MODE_PRIVATE);
+            File file = new File(CONFIG_FILE);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
             dataOutputStream.writeBoolean(overrideEnable);
             dataOutputStream.writeInt(overrideValue);
