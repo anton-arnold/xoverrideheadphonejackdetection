@@ -5,23 +5,39 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 import de.robv.android.xposed.XposedBridge;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class ConfigReceiver extends BroadcastReceiver {
+    private static final String CONFIG_FILE = "xoverrideheadphonejackdetection.cfg";
+
+    private static final boolean defaultOverrideEnable = true;
+    private static final int defaultOverrideValue = 0;
+    private static final int defaultOverrideMask = 255;
+
+
     private boolean isRegistered;
     private boolean overrideEnable;
     private int overrideValue;
     private int overrideMask;
     private Object callbackClass;
+    private Context parentContext;
 
     public ConfigReceiver()
     {
         isRegistered = false;
-        overrideEnable = true;
-        overrideValue = 0;
-        overrideMask =  20;
         callbackClass = null;
+        parentContext = null;
+
+        overrideEnable = defaultOverrideEnable;
+        overrideValue = defaultOverrideValue;
+        overrideMask =  defaultOverrideMask;
     }
 
     @Override
@@ -32,9 +48,11 @@ public class ConfigReceiver extends BroadcastReceiver {
         if(intent != null) {
             Bundle extras = intent.getExtras();
             if(extras != null) {
-                overrideEnable = extras.getInt("overrideEnable", 1) != 0;
-                overrideValue = extras.getInt("overrideValue", 0);
-                overrideMask = extras.getInt("overrideMask", 20);
+                overrideEnable = extras.getInt("overrideEnable", (overrideEnable ? 1 : 0)) != 0;
+                overrideValue = extras.getInt("overrideValue", overrideValue);
+                overrideMask = extras.getInt("overrideMask", overrideMask);
+
+                writeConfig();
             }
         }
 
@@ -79,5 +97,49 @@ public class ConfigReceiver extends BroadcastReceiver {
     public void setCallbackClass(Object val)
     {
         callbackClass = val;
+    }
+
+    public void setParentContext(Context ctx)
+    {
+        parentContext = ctx;
+    }
+
+    public void readConfig()
+    {
+        boolean backupOverrideEnable = overrideEnable;
+        int backupOverrideValue = overrideValue;
+        int backupOverrideMask = overrideMask;
+
+        try {
+            FileInputStream fileInputStream = parentContext.openFileInput(CONFIG_FILE);
+            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+            overrideEnable = dataInputStream.readBoolean();
+            overrideValue = dataInputStream.readInt();
+            dataInputStream.close();
+        }
+        catch(Exception e)
+        {
+            XposedBridge.log("readConfig() failed with exception: " + e.getMessage());
+
+            overrideEnable = backupOverrideEnable;
+            overrideValue = backupOverrideValue;
+            overrideMask = backupOverrideMask;
+        }
+    }
+
+    private void writeConfig()
+    {
+        try {
+            FileOutputStream fileOutputStream = parentContext.openFileOutput(CONFIG_FILE, Context.MODE_PRIVATE);
+            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+            dataOutputStream.writeBoolean(overrideEnable);
+            dataOutputStream.writeInt(overrideValue);
+            dataOutputStream.writeInt(overrideMask);
+            dataOutputStream.close();
+        }
+        catch(Exception e)
+        {
+            XposedBridge.log("writeConfig() failed with exception: " + e.getMessage());
+        }
     }
 }

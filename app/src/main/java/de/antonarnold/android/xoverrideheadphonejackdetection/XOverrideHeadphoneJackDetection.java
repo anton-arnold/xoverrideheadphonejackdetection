@@ -77,6 +77,8 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
                                     if (intentFilter != null) {
                                         XposedBridge.log("registering config receiver intent...");
                                         ctx.registerReceiver(cr, intentFilter);
+                                        cr.setParentContext(ctx);
+                                        cr.readConfig();
                                         cr.setIsRegistered(true);
                                         XposedBridge.log("successfully registered...");
                                     } else {
