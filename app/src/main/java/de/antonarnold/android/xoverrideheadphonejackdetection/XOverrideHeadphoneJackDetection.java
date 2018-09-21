@@ -17,8 +17,6 @@ adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection
 adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 20 --ei overrideMask 255
 adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 0 --ei overrideMask 255
 adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 0
-todo:
-create small gui for enable/disable, values (optional: presets)
  */
 
 
