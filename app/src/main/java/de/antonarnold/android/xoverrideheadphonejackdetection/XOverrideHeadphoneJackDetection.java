@@ -11,6 +11,17 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import de.robv.android.xposed.XposedBridge;
 
+/*
+control via adb:
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 4 --ei overrideMask 20
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 20 --ei overrideMask 20
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 1 --ei overrideValue 0 --ei overrideMask 20
+adb shell am broadcast -a de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver --ei overrideEnable 0
+todo:
+create small gui for enable/disable, values (optional: presets)
+check value+mask bits / internal state machine because of unplausible reactions
+ */
+
 
 public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
     private static final String CONFIG_ACTION = "de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver";
