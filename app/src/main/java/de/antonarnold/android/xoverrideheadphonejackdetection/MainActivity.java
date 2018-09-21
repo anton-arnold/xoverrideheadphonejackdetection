@@ -24,7 +24,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         cbHeadphoneState = new CheckBox(this);
         cbHeadphoneState.setText("Headphone connected");
-        cbEnabledState.setChecked(false);
+        cbHeadphoneState.setChecked(false);
 
         Button btnUpdate = new Button(this);
         btnUpdate.setText("Update Settings");
