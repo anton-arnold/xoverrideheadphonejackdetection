@@ -22,7 +22,7 @@ The GUI does not fetch the active configuration upon start! This may be changed 
 
 ## How does it work internally?
 This module hooks with the help of the XPosed framework into the android system servers
-[**WiredAccessoryManager**] (https://github.com/LineageOS/android_frameworks_base/blob/staging/lineage-15.1/services/core/java/com/android/server/WiredAccessoryManager.java)
+[**WiredAccessoryManager**](https://github.com/LineageOS/android_frameworks_base/blob/staging/lineage-15.1/services/core/java/com/android/server/WiredAccessoryManager.java)
 class and manipulates the parameters of the mehtod
 [**notifyWiredAccessoryChanged**](https://github.com/LineageOS/android_frameworks_base/blob/staging/lineage-15.1/services/core/java/com/android/server/WiredAccessoryManager.java#L122)
 before it's called.
