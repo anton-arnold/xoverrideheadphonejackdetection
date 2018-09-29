@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package de.antonarnold.android.xoverrideheadphonejackdetection;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +34,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private CheckBox cbEnabledState;
     private CheckBox cbHeadphoneState;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package de.antonarnold.android.xoverrideheadphonejackdetection;
 
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -29,6 +30,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import de.robv.android.xposed.XposedBridge;
 
+@SuppressWarnings("RedundantThrows")
 public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
     private static final String CONFIG_ACTION = "de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver";
 
@@ -36,14 +38,15 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
 
     private static ConfigReceiver configReceiverInstance;
 
-    public static ConfigReceiver getConfigReceiver() {
+    private static ConfigReceiver getConfigReceiver() {
         if (configReceiverInstance == null) {
             configReceiverInstance = new ConfigReceiver();
         }
         return configReceiverInstance;
     }
 
-    public static Application getApplicationUsingReflection() throws Exception {
+    @SuppressLint("PrivateApi")
+    private static Application getApplicationUsingReflection() throws Exception {
         return (Application) Class.forName("android.app.ActivityThread")
                 .getMethod("currentApplication").invoke(null, (Object[]) null);
     }
@@ -64,7 +67,7 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
 
                 ConfigReceiver cr = getConfigReceiver();
 
-                if(initializedOnce == false)
+                if(!initializedOnce)
                 {
                     initializedOnce = true;
 

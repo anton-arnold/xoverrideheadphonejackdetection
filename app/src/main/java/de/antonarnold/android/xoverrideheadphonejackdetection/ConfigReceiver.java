@@ -76,7 +76,7 @@ public class ConfigReceiver extends BroadcastReceiver {
         if(callbackClass != null)
         {
             try {
-                callMethod(callbackClass, "notifyWiredAccessoryChanged", new Long(0), new Integer(overrideValue), new Integer(overrideMask));
+                callMethod(callbackClass, "notifyWiredAccessoryChanged", 0L, overrideValue, overrideMask);
             }
             catch(Exception e)
             {
