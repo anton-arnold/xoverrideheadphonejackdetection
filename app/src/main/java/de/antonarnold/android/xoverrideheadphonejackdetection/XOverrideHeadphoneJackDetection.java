@@ -1,5 +1,5 @@
 /*
-This XPosed module allows you to manually override the headphone jack detection of an Android device.
+This Xposed module allows you to manually override the headphone jack detection of an Android device.
 Copyright (C) 2018  Anton Arnold
 
 This program is free software: you can redistribute it and/or modify

@@ -1,7 +1,7 @@
 # XOverrideHeadphoneJackDetection
 
 ## What is this?
-This XPosed module allows you to manually override the headphone jack detection of an Android device.
+This Xposed module allows you to manually override the headphone jack detection of an Android device.
 
 ## Why is this useful?
 Most smartphones provide a headphone/headset jack that allows using a headset instead the internal speaker/microphone.
@@ -11,23 +11,23 @@ With this module you are able to manually control the headphone detection state 
 
 ## How do I use it?
 This is a module for the
-[**XPosed framework**](https://forum.xda-developers.com/xposed/xposed-installer-versions-changelog-t2714053)
+[**Xposed framework**](https://forum.xda-developers.com/xposed/xposed-installer-versions-changelog-t2714053)
 so you need it installed on your phone. For installation and further information refer to their FAQs.
 After installing the XOverrideHeadphoneJackDetection apk, it should be added in the list of modules.
-Before it will become active you have to enable it in the XPosedInstaller's Module section and reboot your phone.
+Before it will become active you have to enable it in the Xposed Installer's Module section and reboot your phone.
 You can check the Logs section to see if this module was loaded properly.
 The **default behavior** is to **override to no headphone detected**.
 In the GUI you can change the behavior. Your changes will be stored and reapplied after reboots.
 The GUI does not fetch the active configuration upon start! This may be changed in future versions.
 
 ## How does it work internally?
-This module hooks with the help of the XPosed framework into the android system servers
+This module hooks with the help of the Xposed framework into the android system servers
 [**WiredAccessoryManager**](https://github.com/LineageOS/android_frameworks_base/blob/staging/lineage-15.1/services/core/java/com/android/server/WiredAccessoryManager.java)
-class and manipulates the parameters of the mehtod
+class and manipulates the parameters of the method
 [**notifyWiredAccessoryChanged**](https://github.com/LineageOS/android_frameworks_base/blob/staging/lineage-15.1/services/core/java/com/android/server/WiredAccessoryManager.java#L122)
 before it's called.
 The GUI uses android intent broadcasts as IPC to configure the module functionality at runtime.
-This necessary since the GUI runs in another context and not able to share a config file with the hooked process without messing around with app permissions.
+This is necessary since the GUI runs in another context and not able to share a config file with the hooked process without messing around with app permissions.
 
 ## Debugging hints
 ### Configure via adb shell

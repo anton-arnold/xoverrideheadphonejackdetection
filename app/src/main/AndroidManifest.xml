@@ -14,7 +14,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="This XPosed module allows you to manually override the headphone jack detection of an Android device." />
+            android:value="This Xposed module allows you to manually override the headphone jack detection of an Android device." />
         <meta-data
             android:name="xposedminversion"
             android:value="53" />
