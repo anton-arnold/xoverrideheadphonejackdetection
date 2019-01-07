@@ -1,6 +1,6 @@
 /*
 This Xposed module allows you to manually override the headphone jack detection of an Android device.
-Copyright (C) 2018  Anton Arnold
+Copyright (C) 2019  Anton Arnold
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,12 +27,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     private static final String CONFIG_ACTION = "de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver";
 
     private CheckBox cbEnabledState;
-    private CheckBox cbHeadphoneState;
+    private RadioGroup rgConnectionState;
+    private RadioButton rbNothingState;
+    private RadioButton rbHeadphoneState;
+    private RadioButton rbHeadsetState;
+    private RadioButton rbLineoutState;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -42,19 +49,43 @@ public class MainActivity extends Activity implements View.OnClickListener {
         cbEnabledState.setText("Override enabled");
         cbEnabledState.setChecked(true);
 
-        cbHeadphoneState = new CheckBox(this);
-        cbHeadphoneState.setText("Headphone connected");
-        cbHeadphoneState.setChecked(false);
+        rbNothingState = new RadioButton(this);
+        rbNothingState.setText("Nothing");
+
+        rbHeadphoneState = new RadioButton(this);
+        rbHeadphoneState.setText("Headphone");
+
+        rbHeadsetState = new RadioButton(this);
+        rbHeadsetState.setText("Headset");
+
+        rbLineoutState = new RadioButton(this);
+        rbLineoutState.setText("Lineout");
 
         Button btnUpdate = new Button(this);
         btnUpdate.setText("Update Settings");
         btnUpdate.setOnClickListener(this);
 
+        TextView tvConnectionState = new TextView(this);
+        tvConnectionState.setText("Connection state:");
+
+        rgConnectionState = new RadioGroup(this);
+        rgConnectionState.addView(rbNothingState);
+        rgConnectionState.addView(rbHeadphoneState);
+        rgConnectionState.addView(rbHeadsetState);
+        rgConnectionState.addView(rbLineoutState);
+        rgConnectionState.check(rgConnectionState.getChildAt(0).getId());
+
+        TextView tvTransitionNote = new TextView(this);
+        tvTransitionNote.setText("Avoid direct changes between connection states. Override to 'Nothing' and make sure the transition is performed before selecting the next one to prevent misbehavior of the internal state machine.");
+        tvTransitionNote.setTextSize(9.0f);
+
         GridLayout layout = new GridLayout(this);
         layout.setColumnCount(1);
         layout.addView(cbEnabledState);
-        layout.addView(cbHeadphoneState);
+        layout.addView(tvConnectionState);
+        layout.addView(rgConnectionState);
         layout.addView(btnUpdate);
+        layout.addView(tvTransitionNote);
         setContentView(layout);
     }
 
@@ -63,7 +94,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Intent intent = new Intent(CONFIG_ACTION);
 
         intent.putExtra("overrideEnable", (cbEnabledState.isChecked() ? 1 : 0));
-        intent.putExtra("overrideValue", (cbHeadphoneState.isChecked() ? 4 : 0));
+
+        int overrideValue;
+
+        if(rbHeadphoneState.isChecked())
+        {
+            overrideValue = 4;
+        }
+        else if(rbHeadsetState.isChecked())
+        {
+            overrideValue = 4 + 16;
+        }
+        else if(rbLineoutState.isChecked())
+        {
+            overrideValue = 64;
+        }
+        else
+        {
+            overrideValue = 0;
+        }
+
+        intent.putExtra("overrideValue", overrideValue);
         intent.putExtra("overrideMask", 255);
 
         Context ctx = getApplicationContext();

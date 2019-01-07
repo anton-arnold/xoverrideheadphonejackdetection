@@ -1,6 +1,6 @@
 /*
 This Xposed module allows you to manually override the headphone jack detection of an Android device.
-Copyright (C) 2018  Anton Arnold
+Copyright (C) 2019  Anton Arnold
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 boolean overrideEnable = true;
                 int overrideValue = 0;
-                int overrideMask = 20;
+                int overrideMask = 255;
 
                 ConfigReceiver cr = getConfigReceiver();
 
@@ -117,10 +117,7 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
                 if(overrideEnable) {
                     XposedBridge.log("override headphone jack detection hook (value: " + param.args[1] + " -> " + overrideValue + " | mask: " + param.args[2] + " -> " + overrideMask + ")");
                     param.args[1] = overrideValue;
-                }
-                else
-                {
-                    XposedBridge.log("override headphone jack detection hook disabled");
+                    param.args[2] = overrideMask;
                 }
             }
         });
