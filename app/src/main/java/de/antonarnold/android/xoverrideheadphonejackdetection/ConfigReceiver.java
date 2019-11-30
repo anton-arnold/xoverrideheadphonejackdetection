@@ -36,12 +36,14 @@ public class ConfigReceiver extends BroadcastReceiver {
     private static final String CONFIG_FILE = "/data/system/xoverrideheadphonejackdetection.cfg.bin";
 
     private static final boolean defaultOverrideEnable = true;
+    private static final boolean defaultOverrideHybridModeEnable = false;
     private static final int defaultOverrideValue = 0;
     private static final int defaultOverrideMask = 255;
 
 
     private boolean isRegistered;
     private boolean overrideEnable;
+    private boolean overrideHybridModeEnable;
     private int overrideValue;
     private int overrideMask;
     private Object callbackClass;
@@ -52,6 +54,7 @@ public class ConfigReceiver extends BroadcastReceiver {
         callbackClass = null;
 
         overrideEnable = defaultOverrideEnable;
+        overrideHybridModeEnable = defaultOverrideHybridModeEnable;
         overrideValue = defaultOverrideValue;
         overrideMask =  defaultOverrideMask;
     }
@@ -64,7 +67,9 @@ public class ConfigReceiver extends BroadcastReceiver {
         if(intent != null) {
             Bundle extras = intent.getExtras();
             if(extras != null) {
-                overrideEnable = extras.getInt("overrideEnable", (overrideEnable ? 1 : 0)) != 0;
+                int overrideControl = extras.getInt("overrideEnable", ( (overrideEnable ? 1 : 0) | (overrideHybridModeEnable ? 2 : 0)));
+                overrideEnable = (overrideControl & 1) != 0;
+                overrideHybridModeEnable = (overrideControl & 2) != 0;
                 overrideValue = extras.getInt("overrideValue", overrideValue);
                 overrideMask = extras.getInt("overrideMask", overrideMask);
 
@@ -73,7 +78,7 @@ public class ConfigReceiver extends BroadcastReceiver {
         }
 
         //enforce update on callback class
-        if((callbackClass != null) && overrideEnable)
+        if((callbackClass != null) && overrideEnable && !overrideHybridModeEnable)
         {
             try {
                 callMethod(callbackClass, "notifyWiredAccessoryChanged", 0L, overrideValue, overrideMask);
@@ -88,6 +93,11 @@ public class ConfigReceiver extends BroadcastReceiver {
     public boolean getOverrideEnable()
     {
         return overrideEnable;
+    }
+
+    public boolean getHybridModeEnable()
+    {
+        return overrideHybridModeEnable;
     }
 
     public int getOverrideValue()
@@ -118,6 +128,7 @@ public class ConfigReceiver extends BroadcastReceiver {
     public void readConfig()
     {
         boolean backupOverrideEnable = overrideEnable;
+        boolean backupOverrideHybridModeEnable = overrideHybridModeEnable;
         int backupOverrideValue = overrideValue;
         int backupOverrideMask = overrideMask;
 
@@ -128,6 +139,9 @@ public class ConfigReceiver extends BroadcastReceiver {
             overrideEnable = dataInputStream.readBoolean();
             overrideValue = dataInputStream.readInt();
             overrideMask = dataInputStream.readInt();
+            if(dataInputStream.available() > 0) {
+                overrideHybridModeEnable = dataInputStream.readBoolean();
+            }
             dataInputStream.close();
         }
         catch(Exception e)
@@ -137,6 +151,7 @@ public class ConfigReceiver extends BroadcastReceiver {
             overrideEnable = backupOverrideEnable;
             overrideValue = backupOverrideValue;
             overrideMask = backupOverrideMask;
+            overrideHybridModeEnable = backupOverrideHybridModeEnable;
         }
     }
 
@@ -149,6 +164,7 @@ public class ConfigReceiver extends BroadcastReceiver {
             dataOutputStream.writeBoolean(overrideEnable);
             dataOutputStream.writeInt(overrideValue);
             dataOutputStream.writeInt(overrideMask);
+            dataOutputStream.writeBoolean(overrideHybridModeEnable);
             dataOutputStream.close();
         }
         catch(Exception e)

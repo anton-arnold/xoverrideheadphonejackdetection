@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static final String CONFIG_ACTION = "de.antonarnold.android.xoverrideheadphonejackdetection.ConfigReceiver";
 
     private CheckBox cbEnabledState;
+    private CheckBox cbHybridState;
     private RadioGroup rgConnectionState;
     private RadioButton rbNothingState;
     private RadioButton rbHeadphoneState;
@@ -48,6 +49,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         cbEnabledState = new CheckBox(this);
         cbEnabledState.setText("Override enabled");
         cbEnabledState.setChecked(true);
+
+        cbHybridState = new CheckBox(this);
+        cbHybridState.setText("Hybrid mode");
+        cbHybridState.setChecked(false);
 
         rbNothingState = new RadioButton(this);
         rbNothingState.setText("Nothing");
@@ -76,12 +81,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         rgConnectionState.check(rgConnectionState.getChildAt(0).getId());
 
         TextView tvTransitionNote = new TextView(this);
-        tvTransitionNote.setText("Avoid direct changes between connection states. Override to 'Nothing' and make sure the transition is performed before selecting the next one to prevent misbehavior of the internal state machine.");
+        tvTransitionNote.setText("Avoid direct changes between connection states. Override to 'Nothing' and make sure the transition is performed before selecting the next one to prevent misbehavior of the internal state machine. Hybrid Mode overrides to the selected state only if a plugged in cable is detected. If you enable this state you may need to plug in and out your cable before it takes effect.");
         tvTransitionNote.setTextSize(9.0f);
 
         GridLayout layout = new GridLayout(this);
         layout.setColumnCount(1);
         layout.addView(cbEnabledState);
+        layout.addView(cbHybridState);
         layout.addView(tvConnectionState);
         layout.addView(rgConnectionState);
         layout.addView(btnUpdate);
@@ -93,7 +99,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     {
         Intent intent = new Intent(CONFIG_ACTION);
 
-        intent.putExtra("overrideEnable", (cbEnabledState.isChecked() ? 1 : 0));
+        intent.putExtra("overrideEnable", ( (cbEnabledState.isChecked() ? 1 : 0) | (cbHybridState.isChecked() ? 2 : 0) ));
 
         int overrideValue;
 

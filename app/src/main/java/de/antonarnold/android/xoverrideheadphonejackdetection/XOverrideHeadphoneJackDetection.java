@@ -62,6 +62,7 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 boolean overrideEnable = true;
+                boolean hybridModeEnable = true;
                 int overrideValue = 0;
                 int overrideMask = 255;
 
@@ -109,15 +110,32 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
                 if((cr != null) && (cr.getIsRegistered()))
                 {
                     overrideEnable = cr.getOverrideEnable();
+                    hybridModeEnable = cr.getHybridModeEnable();
                     overrideValue = cr.getOverrideValue();
                     overrideMask = cr.getOverrideMask();
                 }
 
 
                 if(overrideEnable) {
-                    XposedBridge.log("override headphone jack detection hook (value: " + param.args[1] + " -> " + overrideValue + " | mask: " + param.args[2] + " -> " + overrideMask + ")");
-                    param.args[1] = overrideValue;
-                    param.args[2] = overrideMask;
+                    if(hybridModeEnable)
+                    {
+                        if((int)param.args[1] != 0)
+                        {
+                            XposedBridge.log("override headphone jack detection hook (value: " + param.args[1] + " -> " + overrideValue + " | mask: " + param.args[2] + " -> " + overrideMask + ")");
+                            param.args[1] = overrideValue;
+                            param.args[2] = overrideMask;
+                        }
+                        else
+                        {
+                            XposedBridge.log("override headphone jack detection hook hybrid mode allows transition to connection state 'Nothing'");
+                        }
+                    }
+                    else
+                    {
+                        XposedBridge.log("override headphone jack detection hook (value: " + param.args[1] + " -> " + overrideValue + " | mask: " + param.args[2] + " -> " + overrideMask + ")");
+                        param.args[1] = overrideValue;
+                        param.args[2] = overrideMask;
+                    }
                 }
             }
         });
