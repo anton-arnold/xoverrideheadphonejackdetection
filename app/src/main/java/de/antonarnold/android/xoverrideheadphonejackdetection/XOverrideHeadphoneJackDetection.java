@@ -128,6 +128,7 @@ public class XOverrideHeadphoneJackDetection implements IXposedHookLoadPackage {
                         else
                         {
                             XposedBridge.log("override headphone jack detection hook hybrid mode allows transition to connection state 'Nothing'");
+                            param.args[2] = overrideMask;
                         }
                     }
                     else
